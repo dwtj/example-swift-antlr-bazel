@@ -1,0 +1,33 @@
+genrule(
+    name = "parser",
+    srcs = [":Arith.g4"],
+    outs = [
+        "ArithLexer.swift",
+        "ArithLexerATN.swift",
+        "ArithParser.swift",
+        "ArithListener.swift",
+        "ArithBaseListener.swift",
+        "ArithParserATN.swift",
+    ],
+    cmd = "antlr4 $(location Arith.g4) -o $(@D) -Xexact-output-dir",
+)
+
+load(
+    "@build_bazel_rules_swift//swift:swift.bzl",
+    "swift_library",
+    "swift_binary",
+)
+
+# Compiles the generated sources.
+swift_library(
+    name = "parser_swift",
+    srcs = [":parser"],
+    deps = ["@antlr4_swift_runtime//:runtime"],
+)
+
+swift_binary(
+    name = "exec",
+    srcs = ["main.swift"],
+    deps = [":parser_swift"],
+)
+
